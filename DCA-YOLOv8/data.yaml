@@ -1,0 +1,10 @@
+# dataset path
+train: E:\\yolov8\\dataset\\images\\train
+val:  E:\\yolov8\\dataset\\images\\val
+test:  E:\\yolov8\\dataset\\images\\test
+
+# number of classes
+nc: 1
+
+# class names
+names: ['Stenosis']
