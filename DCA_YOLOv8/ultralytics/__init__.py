@@ -2,7 +2,7 @@
 
 __version__ = "8.1.5"
 
-from ultralytics.data.explorer.explorer import Explorer
+#from ICA_Detection.external.DCA_YOLOv8.DCA_YOLOv8.ultralytics.data.explorer.explorer import Explorer
 from ultralytics.models import RTDETR, SAM, YOLO
 from ultralytics.models.fastsam import FastSAM
 from ultralytics.models.nas import NAS
