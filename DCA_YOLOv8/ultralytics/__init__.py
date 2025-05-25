@@ -9,6 +9,7 @@ from ultralytics.models.nas import NAS
 from ultralytics.utils import ASSETS, SETTINGS as settings
 from ultralytics.utils.checks import check_yolo as checks
 from ultralytics.utils.downloads import download
+import ultralytics.nn as nn
 
 __all__ = (
     "__version__",
@@ -22,4 +23,5 @@ __all__ = (
     "download",
     "settings",
     "Explorer",
+    "nn",
 )

@@ -40,8 +40,6 @@ from ultralytics.nn.modules import (
     ResNetLayer,
     RTDETRDecoder,
     Segment,
-    CoordAtt,
-    upup
 )
 from ultralytics.utils import DEFAULT_CFG_DICT, DEFAULT_CFG_KEYS, LOGGER, colorstr, emojis, yaml_load
 from ultralytics.utils.checks import check_requirements, check_suffix, check_yaml
@@ -633,7 +631,21 @@ def torch_safe_load(weight):
                 "ultralytics.yolo.data": "ultralytics.data",
             }
         ):  # for legacy 8.0 Classify and Pose models
-            return torch.load(file, map_location="cpu"), file  # load
+            # return torch.load(file, map_location="cpu"), file  # load
+            # PyTorch ≥2.6 ships “restricted” loading (weights_only=True).
+            # 1) allow Ultralytics' DetectionModel during safe unpickling
+            from torch.serialization import add_safe_globals
+            try:
+                from ultralytics.nn.tasks import DetectionModel
+                add_safe_globals([DetectionModel])
+            except Exception:
+                pass                                  # older Torch or different layout
+        
+            # 2) force legacy behaviour so checkpoints that contain the whole model
+            #    object still load without manual flags.
+            return torch.load(file,
+                              map_location="cpu",
+                              weights_only=False), file
 
     except ModuleNotFoundError as e:  # e.name is missing module name
         if e.name == "models":
@@ -654,7 +666,21 @@ def torch_safe_load(weight):
         )
         check_requirements(e.name)  # install missing module
 
-        return torch.load(file, map_location="cpu"), file  # load
+        # return torch.load(file, map_location="cpu"), file  # load
+        # PyTorch ≥2.6 ships “restricted” loading (weights_only=True).
+        # 1) allow Ultralytics' DetectionModel during safe unpickling
+        from torch.serialization import add_safe_globals
+        try:
+            from ultralytics.nn.tasks import DetectionModel
+            add_safe_globals([DetectionModel])
+        except Exception:
+            pass                                  # older Torch or different layout
+    
+        # 2) force legacy behaviour so checkpoints that contain the whole model
+        #    object still load without manual flags.
+        return torch.load(file,
+                            map_location="cpu",
+                            weights_only=False), file
 
 
 def attempt_load_weights(weights, device=None, inplace=True, fuse=False):
@@ -788,29 +814,6 @@ def parse_model(d, ch, verbose=True):  # model_dict, input_channels(3)
             if m in (BottleneckCSP, C1, C2, C2f, C3, C3Ghost, C3x, RepC3):
                 args.insert(2, n)  # number of repeats
                 n = 1
-        elif m is CoordAtt: # todo 源码修改 ~4
-            """
-            ch[f]:上一层的
-            args[0]:第0个参数
-            c1:输入通道数
-            c2:输出通道数
-            """
-            c1, c2 = ch[f], args[0]
-            # print("ch[f]:",ch[f])
-            # print("args[0]:",args[0])
-            # print("args:",args)
-            # print("c1:",c1)
-            # print("c2:",c2)
-            if c2 != nc:  # if c2 not equal to number of classes (i.e. for Classify() output)
-                c2 = make_divisible(c2 * width, 8)
-            args = [c1, *args[1:]]
-
-        elif m is upup:
-            c1, c2 = ch[f], args[0]
-            if c2 != nc:  # if c2 not equal to number of classes (i.e. for Classify() output)
-                c2 = make_divisible(c2 * width, 8)
-            args = [c1, *args[1:]]
-
         elif m is AIFI:
             args = [ch[f], *args]
         elif m in (HGStem, HGBlock):

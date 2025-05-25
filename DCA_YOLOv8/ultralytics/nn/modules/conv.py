@@ -6,8 +6,7 @@ import math
 import numpy as np
 import torch
 import torch.nn as nn
-from .coordAtt import CoordAtt
-from .Upup import upup
+
 __all__ = (
     "Conv",
     "Conv2",

@@ -51,8 +51,6 @@ from .conv import (
     LightConv,
     RepConv,
     SpatialAttention,
-    CoordAtt,
-    upup
 )
 from .head import OBB, Classify, Detect, Pose, RTDETRDecoder, Segment
 from .transformer import (
@@ -116,6 +114,4 @@ __all__ = (
     "MLP",
     "ResNetLayer",
     "OBB",
-    "CoordAtt",
-    "upup"
 )
