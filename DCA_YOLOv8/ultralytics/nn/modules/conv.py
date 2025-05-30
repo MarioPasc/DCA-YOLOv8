@@ -21,8 +21,6 @@ __all__ = (
     "CBAM",
     "Concat",
     "RepConv",
-    "upup",
-    "CoordAtt"
 )
 
 
