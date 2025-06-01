@@ -481,7 +481,9 @@ def strip_optimizer(f: Union[str, Path] = "best.pt", s: str = "") -> None:
             strip_optimizer(f)
         ```
     """
-    x = torch.load(f, map_location=torch.device("cpu"))
+    # x = torch.load(f, map_location=torch.device("cpu"))
+    # Explicitly opt-out of the new default introduced in PyTorch 2.6
+    x = torch.load(f, map_location=torch.device("cpu"), weights_only=False)
     if "model" not in x:
         LOGGER.info(f"Skipping {f}, not a valid Ultralytics model.")
         return
